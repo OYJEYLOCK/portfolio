@@ -33,9 +33,10 @@ jobs:
           import zipfile
           with zipfile.ZipFile("portfolio-site.zip") as archive:
               for entry in archive.infolist():
-                  parts = entry.filename.replace("\\", "/").split("/")
+                  normalized = entry.filename.replace("\\", "/")
+                  parts = normalized.split("/")
                   target = pathlib.Path("_site", *parts)
-                  if entry.is_dir():
+                  if normalized.endswith("/"):
                       target.mkdir(parents=True, exist_ok=True)
                   else:
                       target.parent.mkdir(parents=True, exist_ok=True)
