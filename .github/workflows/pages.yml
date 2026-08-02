@@ -41,6 +41,17 @@ jobs:
                   else:
                       target.parent.mkdir(parents=True, exist_ok=True)
                       target.write_bytes(archive.read(entry))
+
+          # GitHub project pages are served from /<repository>/, while the
+          # static export uses root-relative URLs by default. Prefix any
+          # unadjusted HTML URLs so styles and media resolve on Pages.
+          repository = "${{ github.event.repository.name }}"
+          prefix = f"/{repository}/"
+          for target in pathlib.Path("_site").rglob("*.html"):
+              html = target.read_text(encoding="utf-8")
+              html = html.replace('"/', f'"{prefix}')
+              html = html.replace(f'"{prefix}{repository}/', f'"{prefix}')
+              target.write_text(html, encoding="utf-8")
           PY
           touch _site/.nojekyll
       - name: Configure Pages
